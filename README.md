@@ -1,43 +1,80 @@
 # Ex.No: 03   COMPUTE THE AUTO FUNCTION(ACF)
-Date: 
+Date: 29.10.26
 
 ### AIM:
 To Compute the AutoCorrelation Function (ACF) of the data for the first 35 lags to determine the model
 type to fit the data.
 ### ALGORITHM:
-1. Import the necessary packages
-2. Find the mean, variance and then implement normalization for the data.
-3. Implement the correlation using necessary logic and obtain the results
-4. Store the results in an array
-5. Represent the result in graphical representation as given below.
+ALGORITHM:
+
+1. Import the necessary libraries and upload the car dataset.
+2. Extract the price data and calculate its mean and variance.
+3. Normalize the data by subtracting the mean.
+4. Compute the autocorrelation values for the first 35 lags and store them in an array.
+5. Plot the ACF graph and display the autocorrelation values.
 ### PROGRAM:
-import matplotlib.pyplot as plt
-
+```python
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from google.colab import files
+from io import BytesIO
 
-data = [3, 16, 156, 47, 246, 176, 233, 140, 130,
-101, 166, 201, 200, 116, 118, 247,
-209, 52, 153, 232, 128, 27, 192, 168, 208,
-187, 228, 86, 30, 151, 18, 254,
-76, 112, 67, 244, 179, 150, 89, 49, 83, 147, 90,
-33, 6, 158, 80, 35, 186, 127]
+# Upload dataset
+uploaded = files.upload()
 
-lags = range(35)
+# Read dataset
+file_name = next(iter(uploaded))
+data = pd.read_csv(BytesIO(uploaded[file_name]))
 
+# Extract car prices
+data['price'] = pd.to_numeric(data['price'], errors='coerce')
+data = data.dropna(subset=['price'])
 
-#Pre-allocate autocorrelation table
+data = data['price'].to_numpy()
+N = len(data)
 
-#Mean
+# Define lags
+lags = range(min(35, N))
 
-#Variance
+# Mean and variance
+mean = np.mean(data)
+var = np.var(data)
 
-#Normalized data
+# Normalize data
+normalized = data - mean
 
-#Go through lag components one-by-one
+# Pre-allocate autocorrelation values
+acf_values = []
 
-#display the graph
+# Compute autocorrelation for each lag
+for lag in lags:
+    if var == 0:
+        acf = 0
+    else:
+        num = np.sum(normalized[:N-lag] * normalized[lag:])
+        den = (N - lag) * var
+        acf = num / den
+    acf_values.append(acf)
+
+# Display the ACF graph
+plt.figure(figsize=(10, 5))
+plt.stem(lags, acf_values, basefmt=" ")
+plt.xlabel("Lags")
+plt.ylabel("ACF")
+plt.title("AutoCorrelation Function (First 35 Lags)")
+plt.grid(True)
+plt.show()
+
+# Display ACF values
+print("ACF values for first 35 lags:")
+print(acf_values)
+```
+
 
 ### OUTPUT:
+<img width="947" height="527" alt="image" src="https://github.com/user-attachments/assets/4aaa0b05-d894-48cc-9fd4-b6bec27d4689" />
+
 
 ### RESULT:
         Thus we have successfully implemented the auto correlation function in python.
